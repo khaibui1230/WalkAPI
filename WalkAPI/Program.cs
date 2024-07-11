@@ -1,3 +1,6 @@
+using Microsoft.EntityFrameworkCore;
+using WalkAPI.Data;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -6,6 +9,11 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+//add db
+builder.Services.AddDbContext<NZWalkDbContext>(option => 
+option.UseSqlServer(builder.Configuration.GetConnectionString("NZWalkConnectionString"))
+);
 
 var app = builder.Build();
 
