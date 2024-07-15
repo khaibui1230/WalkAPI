@@ -105,27 +105,71 @@ namespace WalkAPI.Controllers
             return CreatedAtAction(nameof(GetById), new { id = regionDomainModel.Id }, regionDto);
         }
 
-        ////Update Region
-        ////PUT : https://localhost:portnumber/api/regions/{id}
-        //[HttpPut]
-        //[Route("{id:Guid}")]
-        //public IActionResult UpdateData([FromRoute] Guid id, [FromBody] UpdateRegionRequestDto updateRegionRequestDto)
-        //{
-        //    //check if region is exist
-        //    var regionDomainModel = dbContext.Regions.FirstOrDefaultAsync(x => x.Id == id);
+        //Update Region
+        //PUT : https://localhost:portnumber/api/regions/{id}
+        [HttpPut]
+        [Route("{id:Guid}")]
+        public IActionResult UpdateData([FromRoute] Guid id, [FromBody] UpdateRegionRequestDto updateRegionRequestDto)
+        {
+            // Check if a region with the given ID exists in the database
+            var regionDomainModel = dbContext.Regions.FirstOrDefault(x => x.Id == id);
 
-        //    if (regionDomainModel == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    //Map Dto to Domain Model
-        //    regionDomainModel.Code = updateRegionRequestDto.Code;
-        //    regionDomainModel.Name = updateRegionRequestDto.Name;
-        //    regionDomainModel
+            // If the region does not exist, return a 404 Not Found response
+            if (regionDomainModel == null)
+            {
+                return NotFound();
+            }
 
-           
+            // Map the properties from the DTO to the domain model
+            regionDomainModel.Code = updateRegionRequestDto.Code; // Update the Code
+            regionDomainModel.Name = updateRegionRequestDto.Name; // Update the Name
+            regionDomainModel.RegionImgUrl = updateRegionRequestDto.RegionImgUrl; // Update the Image URL
 
-        //}
-    
+            // Save the changes to the database
+            dbContext.SaveChanges();
+
+            // Convert the updated domain model back to a DTO for the response
+            var regionDto = new RegionsDto
+            {
+                Id = regionDomainModel.Id, // Set the ID
+                Name = regionDomainModel.Name, // Set the Name
+                Code = regionDomainModel.Code, // Set the Code
+                RegionImgUrl = regionDomainModel.RegionImgUrl // Set the Image URL
+            };
+
+            // Return a 200 OK response with the updated DTO
+            return Ok(regionDto);
+        }
+
+        //Delete 
+        [HttpDelete]
+        [Route("{id:Guid}")]
+
+        public IActionResult DeleteData([FromRoute] Guid id)
+        {
+            var regionDomainModel = dbContext.Regions.FirstOrDefault(x => x.Id == id);
+
+            if (regionDomainModel == null)
+            {
+                return NotFound();
+            }
+
+            dbContext.Regions.Remove(regionDomainModel);
+            dbContext.SaveChanges();
+
+            // Convert the updated domain model back to a DTO for the response
+            var regionDto = new RegionsDto
+            {
+                Id = regionDomainModel.Id, // Set the ID
+                Name = regionDomainModel.Name, // Set the Name
+                Code = regionDomainModel.Code, // Set the Code
+                RegionImgUrl = regionDomainModel.RegionImgUrl // Set the Image URL
+            };
+
+            return Ok();
+        }
     }
+
+
 }
+
