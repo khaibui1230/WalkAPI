@@ -1,5 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using WalkAPI.Data;
+using WalkAPI.Mapping;
+using WalkAPI.Responsitories;
+using WalkAPI.Responsity;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +17,10 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<NZWalkDbContext>(option => 
 option.UseSqlServer(builder.Configuration.GetConnectionString("NZWalkConnectionString"))
 );
+
+builder.Services.AddScoped<IRegionRespositories, SQLRegionResponsitories>();
+
+builder.Services.AddAutoMapper(typeof(AutoMappingProfile));
 
 var app = builder.Build();
 
