@@ -1,0 +1,41 @@
+﻿using AutoMapper; // For mapping between domain models and DTOs
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using WalkAPI.Models.Domain; // Namespace for domain models
+using WalkAPI.Models.DTO; // Namespace for data transfer objects (DTOs)
+using WalkAPI.Responsitories; // Namespace for repository interfaces
+
+namespace WalkAPI.Controllers
+{
+    // Define the route for this controller as "api/walks" and make it an API controller
+    [Route("api/[controller]")]
+    [ApiController]
+    public class WalksController : ControllerBase
+    {
+        // Dependency injection for IMapper and IWalksRespositories
+        private readonly IMapper mapper;
+        private readonly IWalksRespositories walksRespositories;
+
+        // Constructor to initialize IMapper and IWalksRespositories via dependency injection
+        public WalksController(IMapper mapper, IWalksRespositories walksRespositories)
+        {
+            this.mapper = mapper; // Assign the injected IMapper to the local field
+            this.walksRespositories = walksRespositories; // Assign the injected repository to the local field
+        }
+
+        // Endpoint to create a new walk
+        // HTTP POST method: /api/walks
+        [HttpPost]
+        public async Task<IActionResult> Create([FromBody] AddWalksRequestDto addWalksRequestDto)
+        {
+            // Map the incoming DTO to the domain model
+            var walkDomainModel = mapper.Map<Walk>(addWalksRequestDto);
+
+            // Use the repository to create the new walk asynchronously
+            await walksRespositories.CreateAsync(walkDomainModel);
+
+            // Return an OK response
+            return Ok(mapper.Map<WalksDto>(walkDomainModel));
+        }
+    }
+}

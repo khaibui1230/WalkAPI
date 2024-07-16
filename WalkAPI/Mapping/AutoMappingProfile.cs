@@ -11,6 +11,9 @@ namespace WalkAPI.Mapping
             CreateMap<Region, RegionsDto>().ReverseMap();
             CreateMap<AddRegionRequestDto,Region>().ReverseMap();
             CreateMap<UpdateRegionRequestDto,Region>().ReverseMap();
+
+            CreateMap<Walk, WalksDto>().ReverseMap();
+            CreateMap<AddWalksRequestDto,Walk>().ReverseMap();
         }
     }
 }
