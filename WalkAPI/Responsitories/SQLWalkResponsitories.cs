@@ -20,6 +20,20 @@ namespace WalkAPI.Responsitories
 
         }
 
+        public async Task<Walk?> DeleteAsync(Guid id)
+        {
+            var existtingWalk = await dbContext.Walks.FirstOrDefaultAsync(x => x.Id == id);
+            if (existtingWalk == null)
+            {
+                return null;
+            }
+
+            dbContext.Walks.Remove(existtingWalk);
+            await dbContext.SaveChangesAsync();
+
+            return existtingWalk;
+        }
+
         public async Task<List<Walk>> GetAllAsync()
         {
             return await dbContext.Walks.Include("Difficulty").Include("Region").ToListAsync();

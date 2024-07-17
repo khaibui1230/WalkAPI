@@ -82,7 +82,20 @@ namespace WalkAPI.Controllers
             return Ok(mapper.Map<WalksDto>(walkDomainModel));
         }
 
+        //Remove by id
+        //DELETE :"/api/Walk/{id}
+        [HttpDelete]
+        [Route("{id:Guid}")]
+        public async Task<IActionResult> Delete([FromRoute] Guid id)
+        {
+            var deleteDomainModel = await walksRespositories.DeleteAsync(id);
 
+            if (deleteDomainModel == null)
+            { return NotFound(); }
+
+            //Map domain to dto
+            return Ok(mapper.Map<WalksDto> (deleteDomainModel));
+        }
     }
 
 }
