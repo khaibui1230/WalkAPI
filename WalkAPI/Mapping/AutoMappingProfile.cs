@@ -14,6 +14,10 @@ namespace WalkAPI.Mapping
 
             CreateMap<Walk, WalksDto>().ReverseMap();
             CreateMap<AddWalksRequestDto,Walk>().ReverseMap();
+
+            CreateMap<Difficulty,DifficultyDto>().ReverseMap();
+
+            CreateMap<UpdateWalksRequestDto,Walk>().ReverseMap();
         }
     }
 }
