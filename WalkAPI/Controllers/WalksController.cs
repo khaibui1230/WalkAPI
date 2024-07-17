@@ -28,14 +28,19 @@ namespace WalkAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] AddWalksRequestDto addWalksRequestDto)
         {
-            // Map the incoming DTO to the domain model
-            var walkDomainModel = mapper.Map<Walk>(addWalksRequestDto);
+            if (ModelState.IsValid)
+            {
+                // Map the incoming DTO to the domain model
+                var walkDomainModel = mapper.Map<Walk>(addWalksRequestDto);
 
-            // Use the repository to create the new walk asynchronously
-            await walksRespositories.CreateAsync(walkDomainModel);
+                // Use the repository to create the new walk asynchronously
+                await walksRespositories.CreateAsync(walkDomainModel);
 
-            // Return an OK response
-            return Ok(mapper.Map<WalksDto>(walkDomainModel));
+                // Return an OK response
+                return Ok(mapper.Map<WalksDto>(walkDomainModel));
+            }
+            else { return BadRequest(ModelState); }
+
         }
 
         //GET :Walk
@@ -69,17 +74,22 @@ namespace WalkAPI.Controllers
         [Route("{id:Guid}")]
         public async Task<IActionResult> Update([FromRoute] Guid id, UpdateWalksRequestDto updateWalksRequestDto)
         {
-            //Map dto to domain model
-            var walkDomainModel = mapper.Map<Walk>(updateWalksRequestDto);
-
-            walkDomainModel = await walksRespositories.UpdateAsync(id, walkDomainModel);
-
-            if (walkDomainModel == null)
+            if (ModelState.IsValid)
             {
-                return NotFound();
-            }
+                //Map dto to domain model
+                var walkDomainModel = mapper.Map<Walk>(updateWalksRequestDto);
 
-            return Ok(mapper.Map<WalksDto>(walkDomainModel));
+                walkDomainModel = await walksRespositories.UpdateAsync(id, walkDomainModel);
+
+                if (walkDomainModel == null)
+                {
+                    return NotFound();
+                }
+
+                return Ok(mapper.Map<WalksDto>(walkDomainModel));
+            }
+            else { return BadRequest(ModelState); }
+            
         }
 
         //Remove by id
@@ -94,7 +104,7 @@ namespace WalkAPI.Controllers
             { return NotFound(); }
 
             //Map domain to dto
-            return Ok(mapper.Map<WalksDto> (deleteDomainModel));
+            return Ok(mapper.Map<WalksDto>(deleteDomainModel));
         }
     }
 
