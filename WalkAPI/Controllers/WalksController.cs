@@ -47,9 +47,10 @@ namespace WalkAPI.Controllers
         //GET :Walk
         //GET  : /api/walks
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] string? filterOn, [FromQuery] string? filterQuerry,
+            string? sortBy, bool? isAscending  )
         {
-            var walkDomainModel = await walksRespositories.GetAllAsync();
+            var walkDomainModel = await walksRespositories.GetAllAsync(filterOn,filterQuerry,sortBy,isAscending?? true );
             //map domain to Dto
             return Ok(mapper.Map<List<WalksDto>>(walkDomainModel));
         }

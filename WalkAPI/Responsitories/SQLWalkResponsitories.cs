@@ -34,9 +34,35 @@ namespace WalkAPI.Responsitories
             return existtingWalk;
         }
 
-        public async Task<List<Walk>> GetAllAsync()
+        public async Task<List<Walk>> GetAllAsync(string? FilterOn = null, string? FilterQuerry = null
+            ,string? sortBy= null , bool isAscending = true)
         {
-            return await dbContext.Walks.Include("Difficulty").Include("Region").ToListAsync();
+            // Initialize a queryable collection of Walks, including related Difficulty and Region entities.
+            var walks = dbContext.Walks.Include("Difficulty").Include("Region").AsQueryable();
+
+            // Check if both FilterOn and FilterQuerry are provided and not whitespace.
+            if (string.IsNullOrWhiteSpace(FilterOn) == false && string.IsNullOrWhiteSpace(FilterQuerry) == false)
+            {
+                // If FilterOn equals "Name" (case-insensitive), filter the walks by Name.
+                if (FilterOn.Equals("Name", StringComparison.OrdinalIgnoreCase))
+                {
+                    walks = walks.Where(x => x.Name.Contains(FilterQuerry));
+                }
+            }
+
+            //Sortting
+            if (string.IsNullOrWhiteSpace(sortBy) == false)
+            {
+                if (sortBy.Equals("Name", StringComparison.OrdinalIgnoreCase))
+                {
+                    walks = isAscending? walks.OrderBy(x => x.Name) : walks.OrderByDescending(x => x.Name);
+                }else if (sortBy.Equals("LengthInKm", StringComparison.OrdinalIgnoreCase))
+                {
+                    walks = isAscending ? walks.OrderBy(x => x.LengthInKm) : walks.OrderByDescending(x => x.LengthInKm);
+                }                   
+            }
+            // Execute the query and return the result as a list asynchronously.
+            return await walks.ToListAsync();
         }
 
         public async Task<Walk?> GetByIdAsync(Guid id)
@@ -65,8 +91,6 @@ namespace WalkAPI.Responsitories
             await dbContext.SaveChangesAsync();
 
             return existingWalk;
-
-
         }
 
     }
