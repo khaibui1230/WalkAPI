@@ -35,7 +35,8 @@ namespace WalkAPI.Responsitories
         }
 
         public async Task<List<Walk>> GetAllAsync(string? FilterOn = null, string? FilterQuerry = null
-            ,string? sortBy= null , bool isAscending = true)
+            ,string? sortBy= null , bool isAscending = true
+            ,int pageNumber = 1, int pageSize = 1000)
         {
             // Initialize a queryable collection of Walks, including related Difficulty and Region entities.
             var walks = dbContext.Walks.Include("Difficulty").Include("Region").AsQueryable();
@@ -61,8 +62,12 @@ namespace WalkAPI.Responsitories
                     walks = isAscending ? walks.OrderBy(x => x.LengthInKm) : walks.OrderByDescending(x => x.LengthInKm);
                 }                   
             }
+
+            //pagination
+            var skipResults = (pageNumber-1)* pageSize;
+
             // Execute the query and return the result as a list asynchronously.
-            return await walks.ToListAsync();
+            return await walks.Skip(skipResults).Take(pageSize).ToListAsync();
         }
 
         public async Task<Walk?> GetByIdAsync(Guid id)
