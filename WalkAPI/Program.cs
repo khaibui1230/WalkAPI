@@ -34,6 +34,7 @@ builder.Services.AddDbContext<NZWalksAuthDbContext>(options =>
 // Register repository services for dependency injection
 builder.Services.AddScoped<IRegionRespositories, SQLRegionResponsitories>();
 builder.Services.AddScoped<IWalksRespositories, SQLWalkResponsitories>();
+builder.Services.AddScoped<ITokenResponsitory, TokenResponsitory>();
 
 // Add AutoMapper and specify the assembly containing the profiles
 builder.Services.AddAutoMapper(typeof(AutoMappingProfile));
