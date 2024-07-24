@@ -16,7 +16,7 @@ namespace WalkAPI.Controllers
     // https://localhost:1234/api/regions
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+
     public class RegionsController : ControllerBase
     {
         private readonly NZWalkDbContext dbContext;
@@ -32,6 +32,7 @@ namespace WalkAPI.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Reader")]
         public async Task<IActionResult> GetAll()
         {
             //return regionDomain from the database --RegionsDomain
@@ -59,6 +60,7 @@ namespace WalkAPI.Controllers
         //GET : https://localhost:portnumber/api/regions/{id}
         [HttpGet]
         [Route("{id:Guid}")]
+        [Authorize(Roles = "Reader")]
         public async Task<IActionResult> GetById([FromRoute] Guid id)
         {
             //option 1 to find
@@ -90,6 +92,7 @@ namespace WalkAPI.Controllers
         //Different of 200 and 201 (Create a new Data)
         [HttpPost]
         [ValidateModel]
+        [Authorize(Roles = "Writer")]
         public async Task<IActionResult> Create([FromBody] AddRegionRequestDto addRegionRequestDto)
         {
 
@@ -128,7 +131,7 @@ namespace WalkAPI.Controllers
         //PUT : https://localhost:portnumber/api/regions/{id}
         [HttpPut]
         [Route("{id:Guid}")]
-
+        [Authorize(Roles = "Writer")]
         public async Task<IActionResult> UpdateData([FromRoute] Guid id, [FromBody] UpdateRegionRequestDto updateRegionRequestDto)
         {
 
@@ -178,7 +181,7 @@ namespace WalkAPI.Controllers
         //Delete 
         [HttpDelete]
         [Route("{id:Guid}")]
-
+        [Authorize(Roles = "Writer")]
         public async Task<IActionResult> DeleteData([FromRoute] Guid id)
         {
             //var regionDomainModel = await dbContext.Regions.FirstOrDefaultAsync(x => x.Id == id);

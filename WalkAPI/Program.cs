@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore; // For EF Core functionalities
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using System.Text;
 using WalkAPI.Data; // Namespace for database context
 using WalkAPI.Mapping; // Namespace for AutoMapper profiles
@@ -19,7 +20,35 @@ builder.Services.AddControllers(); // Add controller services to the DI containe
 // Add Swagger for API documentation
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer(); // Add endpoints for API explorer
-builder.Services.AddSwaggerGen(); // Add Swagger generation services
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo { Title = "NZ Walks Api", Version = "v1" });
+    options.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = JwtBearerDefaults.AuthenticationScheme
+    });
+
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = JwtBearerDefaults.AuthenticationScheme
+                },
+                Scheme = "Oauth2",
+                Name = JwtBearerDefaults.AuthenticationScheme,
+                In = ParameterLocation.Header
+            },
+            new List<String>()
+        }
+    });
+}); // Add Swagger generation services
 
 // Add DbContext with SQL Server configuration
 builder.Services.AddDbContext<NZWalkDbContext>(options =>
