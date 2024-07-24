@@ -7,7 +7,7 @@ namespace WalkAPI.Data
     public class NZWalkDbContext : DbContext
     {
         //short cut : ctor
-        public NZWalkDbContext(DbContextOptions dbContextOptions) : base(dbContextOptions)
+        public NZWalkDbContext(DbContextOptions<NZWalkDbContext> dbContextOptions) : base(dbContextOptions)
         {
 
         }
