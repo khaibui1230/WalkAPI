@@ -16,6 +16,7 @@ namespace WalkAPI.Data
 
         public DbSet<Region> Regions { get; set; }
         public DbSet<Walk> Walks { get; set; }
+        public DbSet<Image> Images { get; set; }
 
         //seeding the data using Entity frame
         protected override void OnModelCreating(ModelBuilder modelBuilder)
