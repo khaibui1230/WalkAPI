@@ -54,7 +54,10 @@ namespace WalkAPI.Controllers
             var walkDomainModel = await walksRespositories.GetAllAsync(filterOn,filterQuerry
                 ,sortBy,isAscending?? true
                 ,pageNumber, pageSize);
+
+            throw new Exception(" this is new Ex");
             //map domain to Dto
+
             return Ok(mapper.Map<List<WalksDto>>(walkDomainModel));
         }
 

@@ -6,14 +6,34 @@ using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Serilog;
+using Serilog.Events;
 using System.Net.NetworkInformation;
 using System.Text;
 using WalkAPI.Data; // Namespace for database context
 using WalkAPI.Mapping; // Namespace for AutoMapper profiles
+using WalkAPI.Middleware;
 using WalkAPI.Responsitories; // Namespace for repository interfaces
 using WalkAPI.Responsity; // Namespace for repository implementations
 
+
+
+
 var builder = WebApplication.CreateBuilder(args);
+
+//Cấu hình SeriLog
+var logger = new LoggerConfiguration()
+    .MinimumLevel.Debug() // set the minimum is debug
+    .MinimumLevel.Override("Microsoft", LogEventLevel.Information) // override the level of Microsoft
+    .Enrich.FromLogContext()
+    .WriteTo.Console()
+    .WriteTo.File("Logs/NZWalk_log.txt", rollingInterval:RollingInterval.Minute)
+    .CreateLogger();
+
+builder.Logging.ClearProviders();
+builder.Logging.AddSerilog(logger);
+
+//builder.Host.UseSerilog(); // set the serilog is defaul
 
 // Add services to the container.
 
@@ -155,6 +175,8 @@ if (app.Environment.IsDevelopment()) // Check if the environment is development
     app.UseSwaggerUI(); // Use Swagger UI middleware
 }
 
+//Midle Ware
+app.UseMiddleware<ExceptionHandleMiddleware>();
 app.UseHttpsRedirection(); // Redirect HTTP requests to HTTPS
 
 app.UseAuthentication();

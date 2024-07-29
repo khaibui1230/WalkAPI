@@ -22,19 +22,23 @@ namespace WalkAPI.Controllers
         private readonly NZWalkDbContext dbContext;
         private readonly IRegionRespositories regionRespositories;
         private readonly IMapper mapper;
+        private readonly ILogger<RegionsController> logger;
 
         public RegionsController(NZWalkDbContext dbContext, IRegionRespositories regionRespositories
-            , IMapper mapper)
+            , IMapper mapper, ILogger<RegionsController> logger)
         {
             this.dbContext = dbContext;
             this.regionRespositories = regionRespositories;
             this.mapper = mapper;
+            this.logger = logger;
         }
 
         [HttpGet]
         [Authorize(Roles = "Reader")]
         public async Task<IActionResult> GetAll()
         {
+            //save the infor 
+            logger.LogInformation("GetAll Action Invoked");
             //return regionDomain from the database --RegionsDomain
             var regionsDomain = await regionRespositories.GetAllAsync(); // change to async
 
@@ -50,7 +54,8 @@ namespace WalkAPI.Controllers
             //        RegionImgUrl = regionDomain.RegionImgUrl
             //    });
             //}
-
+            //
+            logger.LogInformation($"Fethced regions from resposity {regionsDomain}");
             //Return the Dto to client
             return Ok(mapper.Map<List<RegionsDto>>(regionsDomain));
         }
@@ -68,10 +73,15 @@ namespace WalkAPI.Controllers
 
             //option 2 to find
             //Get region Domain model to database
+
+            //
+            logger.LogInformation($"Get infor by id : [{id}]");
             var regionDomain = await dbContext.Regions.FirstOrDefaultAsync(r => r.Id == id);
 
             if (regionDomain == null)
             {
+                //L
+                logger.LogWarning($"Region not foound for ID{id}");
                 return NotFound();
             }
 
@@ -83,6 +93,7 @@ namespace WalkAPI.Controllers
             //    Code = regionDomain.Code,
             //    RegionImgUrl = regionDomain.RegionImgUrl
             //};
+            logger.LogInformation("Fetched region: {@Region}", regionDomain);
             return Ok(mapper.Map<List<RegionsDto>>(regionDomain));
         }
 
@@ -95,7 +106,7 @@ namespace WalkAPI.Controllers
         [Authorize(Roles = "Writer")]
         public async Task<IActionResult> Create([FromBody] AddRegionRequestDto addRegionRequestDto)
         {
-
+            logger.LogInformation("Create action invoked with DTO: {@AddRegionRequestDto}", addRegionRequestDto);
             //Covert/Map Dto to Domain
             var regionDomainModel = mapper.Map<Region>(addRegionRequestDto);
             //    new Region
@@ -121,7 +132,7 @@ namespace WalkAPI.Controllers
             //    Code = regionDomainModel.Code,
             //    RegionImgUrl = regionDomainModel.RegionImgUrl
             //};
-
+            logger.LogInformation("Created region: {@RegionDto}", regionDto);
             return CreatedAtAction(nameof(GetById), new { id = regionDomainModel.Id }, regionDto);
 
 
@@ -134,7 +145,7 @@ namespace WalkAPI.Controllers
         [Authorize(Roles = "Writer")]
         public async Task<IActionResult> UpdateData([FromRoute] Guid id, [FromBody] UpdateRegionRequestDto updateRegionRequestDto)
         {
-
+            logger.LogInformation("UpdateData action invoked for ID: {Id} with DTO: {@UpdateRegionRequestDto}", id, updateRegionRequestDto);
             //conver to Dto
             var regionDomainModel = mapper.Map<Region>(updateRegionRequestDto);
             //    new Region
@@ -151,6 +162,7 @@ namespace WalkAPI.Controllers
             // If the region does not exist, return a 404 Not Found response
             if (regionDomainModel == null)
             {
+                logger.LogWarning("Region not found for update with ID: {Id}", id);
                 return NotFound();
             }
 
@@ -171,10 +183,9 @@ namespace WalkAPI.Controllers
             //    RegionImgUrl = regionDomainModel.RegionImgUrl // Set the Image URL
             //};
 
-            // Return a 200 OK response with the updated DTO
-            return Ok(mapper.Map<RegionsDto>(regionDomainModel));
-
-
+            var regionDto = mapper.Map<RegionsDto>(regionDomainModel);
+            logger.LogInformation("Updated region: {@RegionDto}", regionDto);
+            return Ok(regionDto);
 
         }
 
@@ -184,11 +195,13 @@ namespace WalkAPI.Controllers
         [Authorize(Roles = "Writer")]
         public async Task<IActionResult> DeleteData([FromRoute] Guid id)
         {
+            logger.LogInformation("DeleteData action invoked for ID: {Id}", id);
             //var regionDomainModel = await dbContext.Regions.FirstOrDefaultAsync(x => x.Id == id);
             var regionDomainModel = await regionRespositories.DeleteAsync(id);
 
             if (regionDomainModel == null)
             {
+                logger.LogWarning("Region not found for deletion with ID: {Id}", id);
                 return NotFound();
             }
 
@@ -204,7 +217,10 @@ namespace WalkAPI.Controllers
             //    RegionImgUrl = regionDomainModel.RegionImgUrl // Set the Image URL
             //};
 
-            return Ok(mapper.Map<RegionsDto>(regionDomainModel));
+            var regionDto = mapper.Map<RegionsDto>(regionDomainModel);//maper
+
+            logger.LogInformation("Deleted region: {@RegionDto}", regionDto);
+            return Ok(regionDto);
         }
     }
 
